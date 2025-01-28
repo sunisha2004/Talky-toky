@@ -1,0 +1,116 @@
+// Variables
+$primary-color: #0e5b52;
+$secondary-color: #075E54;
+$text-color: #FFFFFF;
+$background-color: #ECE5DD;
+$sidebar-bg: #FFFFFF;
+$hover-bg: #F5F5F5;
+$unread-badge-bg: #25D366;
+
+.chat-container {
+  display: flex;
+  height: 100vh;
+  background-color: $background-color;
+
+  .chat-sidebar {
+    width: 30%;
+    background: $sidebar-bg;
+    overflow-y: auto;
+    border-right: 1px solid lighten($background-color, 10%);
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: $hover-bg;
+      }
+
+      .user-profile {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover;
+      }
+
+      .user-details {
+        flex-grow: 1;
+        overflow: hidden;
+
+        .user-name {
+          font-size: 1rem;
+          font-weight: bold;
+          color: $secondary-color;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        .last-message {
+          font-size: 0.875rem;
+          color: darken($secondary-color, 20%);
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+      }
+
+      .message-info {
+        text-align: right;
+
+        .unread-count {
+          background: $unread-badge-bg;
+          color: $text-color;
+          font-size: 0.75rem;
+          font-weight: bold;
+          padding: 4px 8px;
+          border-radius: 12px;
+          margin-bottom: 5px;
+        }
+
+        .last-message-time {
+          font-size: 0.75rem;
+          color: darken($secondary-color, 20%);
+        }
+      }
+    }
+  }
+
+  .add-chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: $primary-color;
+    color: $text-color;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: darken($primary-color, 5%);
+    }
+  }
+
+  .loading {
+    margin: auto;
+    font-size: 1.2rem;
+    color: $secondary-color;
+  }
+
+  .error {
+    margin: auto;
+    font-size: 1.2rem;
+    color: red;
+  }
+}

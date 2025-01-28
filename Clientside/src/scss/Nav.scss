@@ -1,0 +1,101 @@
+// Nav.scss
+
+$primary-color: #25D366; // WhatsApp green
+$secondary-color: #285550; // Darker green
+$text-color: #FFFFFF;
+$input-bg: #ECECEC;
+$dropdown-bg: #FFFFFF;
+$dropdown-hover: #F5F5F5;
+$border-radius: 8px;
+$box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: $secondary-color;
+  color: $text-color;
+  font-family: 'Roboto', sans-serif;
+
+  .navbar-left {
+    .navbar-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+  }
+
+  .navbar-center {
+    .search-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      background: $input-bg;
+      border: 1px solid lighten($secondary-color, 40%);
+      border-radius: $border-radius;
+      outline: none;
+
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 5px rgba(18, 140, 126, 0.5);
+      }
+    }
+  }
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+
+    .profile-pic {
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-left: 1rem;
+
+      .profile-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background: $dropdown-bg;
+      border-radius: $border-radius;
+      box-shadow: $box-shadow;
+      width: 150px;
+      text-align: left;
+
+      .dropdown-item {
+        display: block;
+        padding: 0.75rem;
+        font-size: 1rem;
+        color: $secondary-color;
+        text-decoration: none;
+        border-radius: $border-radius;
+        transition: background 0.3s;
+
+        &:hover {
+          background: $dropdown-hover;
+        }
+
+        button {
+          width: 100%;
+          text-align: left;
+          background: none;
+          border: none;
+          font-size: 1rem;
+          color: $secondary-color;
+          cursor: pointer;
+          padding: 0;
+        }
+      }
+    }
+  }
+}

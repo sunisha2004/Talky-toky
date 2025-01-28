@@ -1,0 +1,67 @@
+// AddChat.scss
+
+.add-chat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #e5ddd5; // Light grey background, similar to WhatsApp
+    height: 100vh;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+  
+    .add-chat-title {
+      font-size: 24px;
+      color: #075e54; // WhatsApp's primary color (dark green)
+      margin-bottom: 20px;
+    }
+  
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 500px;
+      overflow-y: auto;
+      padding-bottom: 20px;
+  
+      .user-card {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+  
+        &:hover {
+          background-color: #f1f1f1; // Light hover effect
+        }
+  
+        .user-profile-pic {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-right: 15px;
+        }
+  
+        .user-info {
+          flex-grow: 1;
+  
+          .user-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #075e54; // WhatsApp primary color
+          }
+  
+          .user-status {
+            font-size: 14px;
+            color: #999;
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+  }
+  

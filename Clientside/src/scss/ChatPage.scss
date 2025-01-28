@@ -1,0 +1,128 @@
+// ChatPage.scss
+
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f0f0; // Light grey background for chat window
+    font-family: 'Roboto', sans-serif;
+    
+    // Navbar styling (Profile header)
+    .navbar {
+      display: flex;
+      align-items: center;
+      background-color: #075e54; // WhatsApp header color
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+      .profile {
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+  
+        .profile-pic {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-right: 10px;
+        }
+  
+        .username {
+          color: white;
+          font-size: 18px;
+          font-weight: bold;
+          margin-left: 5px;
+        }
+      }
+    }
+  
+    // Chat display window
+    .chat-display {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: scroll;
+      padding-bottom: 100px; // Space for the input area at the bottom
+  
+      // Styling for chat messages
+      .chat-message {
+        display: flex;
+        flex-direction: column;
+        max-width: 75%;
+        margin-bottom: 15px;
+        border-radius: 15px;
+        padding: 10px;
+        position: relative;
+  
+        // Styling for sent messages
+        &.sent {
+          align-self: flex-end;
+          background-color: #dcf8c6; // Light green background for sent messages
+          margin-left: 20px;
+  
+          .message-time {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+          }
+        }
+  
+        // Styling for received messages
+        &.received {
+          align-self: flex-start;
+          background-color: #ffffff; // White background for received messages
+          margin-right: 20px;
+  
+          .message-time {
+            text-align: left;
+            font-size: 12px;
+            color: #999;
+          }
+        }
+  
+        .message-text {
+          font-size: 16px;
+          color: #4c4c4c;
+        }
+      }
+    }
+  
+    // Chat input area
+    .chat-input {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      position: fixed;
+      bottom: 0;
+      width: 98%;
+      z-index: 10;
+  
+      input {
+        flex-grow: 1;
+        padding: 10px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        outline: none;
+        margin-right: 10px;
+        background-color: #f1f1f1;
+      }
+  
+      button {
+        background-color: #075e54; // WhatsApp send button color
+        border: none;
+        border-radius: 50%;
+        padding: 10px;
+        cursor: pointer;
+        color: white;
+        font-size: 20px;
+  
+        &:hover {
+          background-color: #128c7e; // Darker green when hovered
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,41 @@
+// EmailNotification.scss
+
+$primary-color: #25D366; // WhatsApp green
+$secondary-color: #128C7E; // Darker green
+$text-color: #FFFFFF;
+$box-bg-color: #FFFFFF;
+$border-radius: 8px;
+$box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+.verify-email-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: $secondary-color;
+  color: $text-color;
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+}
+
+.verify-email-box {
+  background: $box-bg-color;
+  padding: 2rem;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  width: 100%;
+  max-width: 400px;
+
+  .title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $secondary-color;
+    margin-bottom: 1rem;
+  }
+
+  .message {
+    font-size: 1rem;
+    color: $secondary-color;
+    line-height: 1.5;
+  }
+}
