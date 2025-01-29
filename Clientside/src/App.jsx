@@ -10,6 +10,7 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 import AddChat from './components/AddChat';
 import ChatPage from './components/ChatPage';
+import ViewProfile from './components/ViewProfile';
 
 
 function App() {
@@ -32,6 +33,8 @@ function App() {
     <Route path="/emailNotification" element={<EmailNotification />} />
     <Route path="/addChat" element={<AddChat />} />
     <Route path="/chatPage/:id" element={<ChatPage />} />
+    <Route path="/viewProfile/:id" element={<ViewProfile />} />
+
 
 
 

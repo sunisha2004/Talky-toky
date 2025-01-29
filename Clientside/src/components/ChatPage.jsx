@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { FaPaperPlane } from "react-icons/fa";
+import React, { useEffect, useState, useRef } from "react";
+import { FaPaperPlane, FaEllipsisV } from "react-icons/fa";
 import axios from "axios";
+import { io } from "socket.io-client";
 import api from "../api/ApiConfig";
 import "../scss/ChatPage.scss";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+
+const socket = io("http://localhost:3001");
 
 const ChatPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [profile, setProfile] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const token = localStorage.getItem("token");
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -25,7 +31,7 @@ const ChatPage = () => {
     };
 
     fetchProfile();
-  }, [id]);
+  }, [id, token]);
 
   useEffect(() => {
     const showMessage = async () => {
@@ -52,7 +58,9 @@ const ChatPage = () => {
   useEffect(() => {
     const updateSeenStatus = async () => {
       try {
-        await axios.put(`${api}/updateSeen`,{ senderID: id },
+        await axios.put(
+          `${api}/updateSeen`,
+          { senderID: id },
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -64,8 +72,19 @@ const ChatPage = () => {
 
     if (messages.length > 0) {
       updateSeenStatus();
+      scrollToBottom();
     }
   }, [id, messages, token]);
+
+  useEffect(() => {
+    socket.on("newMessage", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, []);
 
   const handleSendMessage = async () => {
     if (inputMessage.trim()) {
@@ -81,10 +100,23 @@ const ChatPage = () => {
           }
         );
         setInputMessage("");
+        scrollToBottom();
       } catch (error) {
         console.error("Error sending message:", error);
       }
     }
+  };
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleDropdownToggle = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleRedirect = () => {
+    navigate(`/viewProfile/${id}`);
   };
 
   return (
@@ -102,6 +134,17 @@ const ChatPage = () => {
           />
           <span className="username">{profile?.username || "Loading..."}</span>
         </div>
+        <div className="dropdown">
+          <FaEllipsisV
+            className="dropdown-icon"
+            onClick={handleDropdownToggle}
+          />
+          {dropdownOpen && (
+            <ul className="dropdown-menu">
+              <li onClick={handleRedirect}>View Profile</li>
+            </ul>
+          )}
+        </div>
       </div>
 
       {/* Chat Display */}
@@ -117,6 +160,7 @@ const ChatPage = () => {
             </div>
           </div>
         ))}
+        <div ref={chatEndRef} />
       </div>
 
       {/* Chat Input */}

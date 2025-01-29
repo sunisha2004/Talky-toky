@@ -2,18 +2,40 @@ import userSchema from "./models/user.model.js"
 import chatListSchema from "./models/chatList.model.js"
 import chatSchema from "./models/chat.model.js"
 
+import { io } from "./app.js";
 import nodemailer from 'nodemailer'
 
 import bcrypt from "bcrypt"
 import pkg from "jsonwebtoken"
+
+import crypto from 'crypto'
+
+const secretKey = "a3f1b2c4d5e6f7g8h9i0j1k2l3m4n5o6"; // Ensure it's 32 characters long
+
+function encryptMessage(message) {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(secretKey), iv);
+  let encrypted = cipher.update(message, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return `${iv.toString("hex")}:${encrypted}`;
+}
+
+function decryptMessage(encryptedMessage) {
+  const [iv, encrypted] = encryptedMessage.split(":");
+  const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(secretKey), Buffer.from(iv, "hex"));
+  let decrypted = decipher.update(encrypted, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+}
+
 const { sign } = pkg
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "sunishams2004@gmail.com",
-    pass: "xgrj cojw wpfl stau",
-  },
+         user: "sunishams2004@gmail.com",
+         pass: "xgrj cojw wpfl stau",
+       },
 })
 
 
@@ -55,15 +77,23 @@ export async function verifyEmail(req, res) {
         subject: "verify",
         text: "VERIFY! your email",
         html: `
-      <div class=" page" style="width: 500px; height: 300px; display: flex; 
+      <div class="page" style="width: 500px; height: 300px; display: flex; 
       align-items: center; justify-content: center; flex-direction: column;
-       background-color: gainsboro;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; ">
-          <h2>Email verification</h2>
-          <p>Click This Button to verify its you</p>
-          <a href="http://localhost:5173/register"><button style="padding: 5px 15px; border: none; border-radius: 4px; 
-          background-color: white;box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-          font-size: 18px; color: red; font-style: italic;" >Verify</button></a>
-      </div>`,
+      background-color: #f9f9f9; border-radius: 10px; padding: 20px;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 20px;">
+  <h2 style="font-size: 24px; color: #333; margin-bottom: 10px;">Verify Your Email</h2>
+  <p style="font-size: 16px; color: #555; margin-bottom: 20px; text-align: center;">
+    Please confirm your email address by clicking the button below.
+  </p>
+  <a href="http://localhost:5173/register" style="text-decoration: none;">
+    <button style="padding: 10px 20px; border: none; border-radius: 25px; 
+        background-color: #007BFF; color: white; font-size: 16px; 
+        cursor: pointer; transition: background-color 0.3s ease;">
+      Verify Email
+    </button>
+  </a>
+</div>
+`,
       })
       console.log("Message sent: %s", info.messageId)
       res.status(200).send({ msg: "Verificaton email sented" })
@@ -124,31 +154,37 @@ export async function getUsers(req, res) {
 
 export async function addMessage(req, res) {
   try {
-    const { message, receiverID } = req.body
-    const time= new Date()
-    const check=await chatListSchema.findOne({ senderID:req.user.UserID, receiverID:receiverID})
-    const users = await chatSchema.create({ senderID:req.user.UserID, receiverID, message, time, seen: false});
-    if(!check){
-      const chat = await chatListSchema.create({ senderID:req.user.UserID, receiverID})
+    const { message, receiverID } = req.body;
+    const time = new Date();
+    const encryptedMessage = encryptMessage(message);
+
+    const check = await chatListSchema.findOne({ senderID: req.user.UserID, receiverID });
+    await chatSchema.create({ senderID: req.user.UserID, receiverID, message: encryptedMessage, time, seen: false });
+
+    if (!check) {
+      await chatListSchema.create({ senderID: req.user.UserID, receiverID });
+      await chatListSchema.create({ senderID: receiverID, receiverID: req.user.UserID });
     }
-    
-    res.status(201).send({msg: "Successfull"});
+
+    io.emit("newMessage", { senderID: req.user.UserID, receiverID, message, time });
+    res.status(201).send({ msg: "Successful" });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).send({ message: "An error occurred while fetching users", error: error.message });
+    console.error("Error adding message:", error);
+    res.status(500).send({ message: "An error occurred while adding message", error: error.message });
   }
 }
 
-
-export async function getMessages(req, res) { 
+export async function getMessages(req, res) {
   try {
     const sendmsg = await chatSchema.find({ senderID: req.user.UserID, receiverID: req.params.id });
     const receivemsg = await chatSchema.find({ senderID: req.params.id, receiverID: req.user.UserID });
 
-    // Combine both message arrays and sort them
-    const messages = [...sendmsg, ...receivemsg];
-    messages.sort((a, b) => a.time - b.time);
+    const messages = [...sendmsg, ...receivemsg].map(msg => ({
+      ...msg._doc,
+      message: decryptMessage(msg.message),
+    }));
 
+    messages.sort((a, b) => a.time - b.time);
     res.status(200).send({ messages });
   } catch (error) {
     console.error("Error fetching messages:", error);
@@ -157,22 +193,25 @@ export async function getMessages(req, res) {
 }
 
 
-export async function getRecievers(req, res) { 
+export async function getRecievers(req, res) {
   try {
-    const data = await chatListSchema.find({ senderID:req.user.UserID});
-    const users = await Promise.all(data.map(async (item) => {
-      const usr = await userSchema.findOne({_id: item.receiverID});
-      const lastmsg = await chatSchema.findOne({ senderID: item.receiverID, receiverID: req.user.UserID, seen: false }).sort({ time: -1 });
-      const count = await chatSchema.countDocuments({ senderID: item.receiverID, receiverID: req.user.UserID, seen: false })
-      return {
-        id: usr._id,
-        profile: usr?.profile || null,
-        name: usr?.username || "Unknown",
-        lastmsg: lastmsg?.message || "No new message !",
-        lastmsgtime: lastmsg?.time || null,
-        count: count,
-      };
-    }));
+    const data = await chatListSchema.find({ senderID: req.user.UserID });
+    const users = await Promise.all(
+      data.map(async (item) => {
+        const usr = await userSchema.findOne({ _id: item.receiverID });
+        const lastmsg = await chatSchema.findOne({ senderID: item.receiverID, receiverID: req.user.UserID, seen: false }).sort({ time: -1 });
+        const count = await chatSchema.countDocuments({ senderID: item.receiverID, receiverID: req.user.UserID, seen: false });
+
+        return {
+          id: usr._id,
+          profile: usr?.profile || null,
+          name: usr?.username || "Unknown",
+          lastmsg: lastmsg ? decryptMessage(lastmsg.message) : "No new message !",
+          lastmsgtime: lastmsg?.time || null,
+          count: count,
+        };
+      })
+    );
     res.status(200).send({ users });
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -183,12 +222,12 @@ export async function getRecievers(req, res) {
 
 export async function updateSeen(req, res) {
   try {
-    const { senderID }=req.body
-    const update = await chatSchema.updateMany({ senderID: senderID, receiverID: req.user.UserID },{ $set: { seen: true } });
+    const { senderID } = req.body;
+    await chatSchema.updateMany({ senderID, receiverID: req.user.UserID }, { $set: { seen: true } });
     res.status(200).send({ msg: "Updated" });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).send({ message: "An error occurred while fetching users", error: error.message });
+    console.error("Error updating seen status:", error);
+    res.status(500).send({ message: "An error occurred while updating messages", error: error.message });
   }
 }
 
@@ -196,13 +235,7 @@ export async function updateSeen(req, res) {
 export async function getProfile(req, res) {
   try {
     const data = await userSchema.findOne({_id: req.user.UserID});
-    // const data1={
-    //   profile: data.profile,
-    //   username: data.username,
-    //   email: data.email,
-    //   phone: data.phone,
-    //   pass: 'my original password',
-    // }
+    
     res.status(200).send({ data });
   } catch (error) {
     console.error("Error fetching users:", error);

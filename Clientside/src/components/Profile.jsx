@@ -118,14 +118,14 @@ const Profile = () => {
             onChange={handleInputChange}
             disabled={!editMode}
           />
-          <label>Password</label>
+          {/* <label>Password</label>
           <input
             type="password"
             name="pass"
             value={profileData.pass}
             onChange={handleInputChange}
             disabled={!editMode}
-          />
+          /> */}
         </div>
 
         <div className="profile-actions">

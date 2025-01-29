@@ -4,6 +4,7 @@ import * as rh from './reqhandler.js'
 
 const router=Router()
 
+
 router.route('/adduser').post(rh.addUser)
 router.route('/login').post(rh.login)
 router.route('/verifyEmail').post(rh.verifyEmail)
@@ -16,5 +17,6 @@ router.route('/getReciever/:id').get(Auth,rh.getReciever)
 router.route('/getMessage/:id').get(Auth,rh.getMessages)
 router.route('/sendMessage').post(Auth,rh.addMessage)
 router.route('/updateSeen').put(Auth,rh.updateSeen)
+
 
 export default router

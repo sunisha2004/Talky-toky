@@ -32,9 +32,20 @@ const Register = () => {
     }
   };
 
+  // Password validation function
+  const validatePassword = (password) => {
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return strongPasswordRegex.test(password);
+  };
+
   // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!validatePassword(password)) {
+      alert("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
@@ -84,7 +95,7 @@ const Register = () => {
             />
           </div>
           <div className="input-group">
-            {/* <label htmlFor="username">Username</label> */}
+            <label htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
@@ -95,7 +106,7 @@ const Register = () => {
             />
           </div>
           <div className="input-group">
-            {/* <label htmlFor="email">Email</label> */}
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
@@ -105,7 +116,7 @@ const Register = () => {
             />
           </div>
           <div className="input-group">
-            {/* <label htmlFor="phone">Phone</label> */}
+            <label htmlFor="phone">Phone</label>
             <input
               type="tel"
               id="phone"
@@ -118,7 +129,7 @@ const Register = () => {
             />
           </div>
           <div className="input-group">
-            {/* <label htmlFor="password">Password</label> */}
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
@@ -129,7 +140,7 @@ const Register = () => {
             />
           </div>
           <div className="input-group">
-            {/* <label htmlFor="confirm-password">Confirm Password</label> */}
+            <label htmlFor="confirm-password">Confirm Password</label>
             <input
               type="password"
               id="confirm-password"
